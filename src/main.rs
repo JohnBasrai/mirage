@@ -1,4 +1,4 @@
-#![allow(unused)]
+
 use clap::{Subcommand, Parser};
 
 #[derive(Debug, Parser)]
@@ -7,7 +7,7 @@ struct Args {
     command: Command,
 }
 
-use anyhow::{Context, Result, Error};
+use anyhow::{Context, Result};
 
 fn main() -> Result<()> {
     let args = Args::parse();
@@ -42,32 +42,32 @@ enum Command {
     },
 
 
-    /// rotate an image by the given degrees
+    /// rotate an image by the given degrees, valid values 90, 180 or 270
     Rotate {
         infile:  String,
         outfile: String,
-        degrees: u32,   // 90, 180, or 270
+        degrees: u32,
     },
 
-    /// Generate a new image in outfile
+    /// generate a new image in outfile
     Generate  {
         outfile: String,
         value:   i32
     },
 
-    /// Invert an image from infile to outfile
+    /// invert an image from infile to outfile
     Invert {
         infile:  String,
         outfile: String,
     },
 
-    /// Convert an image to grey scale
+    /// convert an image to grey scale
     Grayscale {
         infile:  String,
         outfile: String,
     },
 
-    /// Generate a fractal image in the file provided.
+    /// generate a fractal image in the file provided.
     Fractal {
         outfile: String,
         width:  u32,
@@ -100,9 +100,13 @@ impl Command {
                 let img = image::open(&infile).context(format!("Failed to open {}", infile))?;
                 let img = img.huerotate(degrees as i32);
                 let img =
-                    if degrees ==  90 { img.rotate90()  } else
-                    if degrees == 180 { img.rotate180() } else
-                    { img.rotate180() };
+                    match degrees {
+                         90 => img.rotate90(),
+                        180 => img.rotate180(),
+                        270 => img.rotate180(),
+                        _   => return Err(
+                            anyhow::anyhow!("Invalid rotation value:{} use 90, 180 or 270", degrees)),
+                    };
                 img.save(&outfile).context(format!("Failed writing {}.", outfile))
             },
             Self::Invert {infile, outfile} => {
