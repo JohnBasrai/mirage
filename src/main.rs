@@ -19,7 +19,8 @@ enum Command {
     Blur {
         infile: String,
         outfile: String,
-        value: f32,
+        #[arg(value_parser = percent_in_range)]
+        percent: f32,
     },
 
     /// brighten an image by given amount
@@ -43,6 +44,7 @@ enum Command {
     Rotate {
         infile: String,
         outfile: String,
+        #[arg(value_parser = rotate_valid)]
         degrees: u32,
     },
 
@@ -89,9 +91,9 @@ impl Command {
             Self::Blur {
                 infile,
                 outfile,
-                value,
+                percent,
             } => {
-                let img = imageop!(infile, blur, value);
+                let img = imageop!(infile, blur, percent);
                 img.save(&outfile)
                     .context(format!("Failed writing {}.", outfile))
             }
@@ -163,6 +165,31 @@ impl Command {
     } // fn execute
 }
 
+fn rotate_valid(str: &str) -> Result<u32, String> {
+    let degrees: u32 = str
+        .parse()
+        .map_err(|_| format!("`{}` Isn't a valid number.", str))?;
+
+    match degrees {
+        val if val == 90 || val == 180 || val == 270 => Ok(val),
+        _ => Err(format!("Rotation value must one of: 90, 180 or 270")),
+    }
+}
+
+fn percent_in_range(str: &str) -> Result<f32, String> {
+    let value: f32 = str
+        .parse::<f32>()
+        .map_err(|_| format!("`{}` Isn't valid percentage.", str))?;
+
+    if value >= 0.0 && value <= 100.0 {
+        Ok(value)
+    } else {
+        Err(format!("not in range 0 - 100"))
+    }
+}
+
+
+
 fn generate(outfile: &String, color: i32) -> Result<()> {
     println!(
         "\nGenerate: file={}, color={} is not yet implemented",
@@ -216,4 +243,11 @@ fn fractal(outfile: &String, width: u32, height: u32) -> Result<()> {
     }
     imgbuf.save(outfile)?;
     Ok(())
+}
+
+mod test {
+    #[test]
+    fn basics() {
+        assert_eq!(0, 0);
+    }
 }
