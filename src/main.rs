@@ -19,8 +19,8 @@ enum Command {
     Blur {
         infile: String,
         outfile: String,
-        #[arg(value_parser = percent_in_range)]
-        percent: f32,
+        #[arg(value_parser = clap::value_parser!(u32).range(0..=100))]
+        percent: u32,
     },
 
     /// brighten an image by given amount
@@ -93,7 +93,7 @@ impl Command {
                 outfile,
                 percent,
             } => {
-                let img = imageop!(infile, blur, percent);
+                let img = imageop!(infile, blur, percent as f32);
                 img.save(&outfile)
                     .context(format!("Failed writing {}.", outfile))
             }
