@@ -1,47 +1,16 @@
-    cargo run --help
-    Run a binary or example of the local package
+    cargo run --quiet -- --help 
+    Usage: mirage <COMMAND>
     
-    Usage: cargo run [OPTIONS] [ARGS]...
-    
-    Arguments:
-      [ARGS]...  Arguments for the binary or example to run
+    Commands:
+      blur       blur an image by a given percentage
+      brighten   brighten an image by given amount
+      crop       crop an image to x, y, width, height
+      rotate     rotate an image by the given degrees, valid values 90, 180 or 270
+      generate   generate a new image in outfile
+      invert     invert an image from infile to outfile
+      grayscale  convert an image to grey scale
+      fractal    generate a fractal image in the file provided
+      help       Print this message or the help of the given subcommand(s)
     
     Options:
-          --message-format <FMT>  Error format
-      -v, --verbose...            Use verbose output (-vv very verbose/build.rs output)
-      -q, --quiet                 Do not print cargo log messages
-          --color <WHEN>          Coloring: auto, always, never
-          --config <KEY=VALUE>    Override a configuration value
-      -Z <FLAG>                   Unstable (nightly-only) flags to Cargo, see 'cargo -Z help' for details
-      -h, --help                  Print help
-    
-    Package Selection:
-      -p, --package [<SPEC>]  Package with the target to run
-    
-    Target Selection:
-          --bin [<NAME>]      Name of the bin target to run
-          --example [<NAME>]  Name of the example target to run
-    
-    Feature Selection:
-      -F, --features <FEATURES>  Space or comma separated list of features to activate
-          --all-features         Activate all available features
-          --no-default-features  Do not activate the `default` feature
-    
-    Compilation Options:
-      -j, --jobs <N>                Number of parallel jobs, defaults to # of CPUs.
-          --keep-going              Do not abort the build as soon as there is an error
-      -r, --release                 Build artifacts in release mode, with optimizations
-          --profile <PROFILE-NAME>  Build artifacts with the specified profile
-          --target [<TRIPLE>]       Build for the target triple
-          --target-dir <DIRECTORY>  Directory for all generated artifacts
-          --unit-graph              Output build graph in JSON (unstable)
-          --timings[=<FMTS>]        Timing output formats (unstable) (comma separated): html, json
-    
-    Manifest Options:
-          --manifest-path <PATH>  Path to Cargo.toml
-          --ignore-rust-version   Ignore `rust-version` specification in packages
-          --locked                Assert that `Cargo.lock` will remain unchanged
-          --offline               Run without accessing the network
-          --frozen                Equivalent to specifying both --locked and --offline
-    
-    Run `cargo help run` for more detailed information.
+      -h, --help  Print help
