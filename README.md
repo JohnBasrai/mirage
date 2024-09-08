@@ -1,4 +1,3 @@
-Usage:
     cargo run --help
     Run a binary or example of the local package
     
