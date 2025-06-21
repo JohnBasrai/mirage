@@ -30,4 +30,4 @@ jobs:
         run: cargo build --quiet --release
 
       - name: Run tests (cargo test --release)
-        run: cargo test --quiet --release --all-targets -- --nocapture
+        run: cargo test --quiet --release --all-targets
