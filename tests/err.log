@@ -1,0 +1,108 @@
+   Compiling mirage v0.1.2 (/home/johnb/Documents/JohnBasrai/github/mirage)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s
+     Running unittests src/main.rs (/home/johnb/Documents/JohnBasrai/github/mirage/target/debug/deps/mirage-7d0d89cd2badc3a0)
+
+running 11 tests
+fractal: f:/tmp/.tmpXlYmZN/test_fractal.png, w:100, h:100
+fractal: f:/tmp/.tmp9NJWus/small.png, w:10, h:10
+
+Generate: file=/tmp/.tmpIZziOp/test_generate.png, color=255 is not yet implemented
+test tests::test_command_debug_formatting ... ok
+test tests::test_error_handling_context ... ok
+test tests::test_imageop_macro_compiles ... ok
+test tests::test_generate_placeholder_behavior ... ok
+test tests::test_rotate_valid_accepts_valid_degrees ... ok
+test tests::test_rotate_valid_error_messages ... ok
+test tests::test_rotate_valid_rejects_invalid_degrees ... ok
+test tests::test_rotate_valid_rejects_non_numeric ... ok
+fractal: f:/tmp/.tmp9NJWus/large.png, w:200, h:200
+test tests::test_args_parser_structure ... ok
+test tests::test_fractal_creates_file ... ok
+test tests::test_fractal_different_dimensions ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/integration.rs (/home/johnb/Documents/JohnBasrai/github/mirage/target/debug/deps/integration-469fbb08a6330785)
+
+running 13 tests
+
+Generate: file=/tmp/.tmpQSxZFz/test_generate.png, color=255 is not yet implemented
+test test_generate_placeholder_smoke ... ok
+error: invalid value '150' for '<PERCENT>': 150 is not in 0..=100
+
+For more information, try '--help'.
+error: invalid value '45' for '<DEGREES>': Invalid rotation value:45 must one of: 90, 180 or 270
+
+For more information, try '--help'.
+Error: Failed to open nonexistent.png
+
+Caused by:
+    No such file or directory (os error 2)
+test test_invalid_input_file ... ok
+fractal: f:/tmp/.tmpSyJ9MS/test_fractal.png, w:100, h:150
+Usage: mirage <COMMAND>
+
+Commands:
+  blur       blur an image by a given percentage
+  brighten   brighten an image by given amount
+  crop       crop an image to x, y, width, height
+  rotate     rotate an image by the given degrees, valid values 90, 180 or 270
+  generate   generate a new image in outfile
+  invert     invert an image from infile to outfile
+  grayscale  convert an image to grey scale
+  fractal    generate a fractal image in the file provided
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+test test_fractal_smoke ... ok
+test test_crop_smoke ... ok
+error: unexpected argument '-1' found
+
+  tip: to pass '-1' as a value, use '-- -1'
+
+Usage: mirage blur <INFILE> <OUTFILE> <PERCENT>
+
+For more information, try '--help'.
+test test_invalid_blur_percentage ... ok
+test test_grayscale_integration ... ok
+blur an image by a given percentage
+
+Usage: mirage blur <INFILE> <OUTFILE> <PERCENT>
+
+Arguments:
+  <INFILE>   
+  <OUTFILE>  
+  <PERCENT>  
+
+Options:
+  -h, --help  Print help
+test test_help_commands ... ok
+error: invalid value '360' for '<DEGREES>': Invalid rotation value:360 must one of: 90, 180 or 270
+
+For more information, try '--help'.
+test test_invalid_rotation_degrees ... ok
+error: unexpected argument '-2' found
+
+  tip: to pass '-2' as a value, use '-- -2'
+
+Usage: mirage brighten <INFILE> <OUTFILE> <AMOUNT>
+
+For more information, try '--help'.
+Error: Darken command should succeed
+test test_brighten_smoke ... FAILED
+test test_invert_integration ... ok
+test test_rotate_integration ... ok
+Error: Blurred image should have lower variance than original (original: 0.00, blurred: 7.55)
+test test_blur_integration ... FAILED
+test test_operation_consistency ... ok
+
+failures:
+
+failures:
+    test_blur_integration
+    test_brighten_smoke
+
+test result: FAILED. 11 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.87s
+
+error: test failed, to rerun pass `--test integration`
