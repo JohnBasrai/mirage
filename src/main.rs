@@ -450,7 +450,7 @@ mod tests {
         use clap::Parser;
 
         // Test parsing a valid blur command
-        let args = Args::try_parse_from(&["mirage", "blur", "input.jpg", "output.jpg", "50"]);
+        let args = Args::try_parse_from(["mirage", "blur", "input.jpg", "output.jpg", "50"]);
         ensure!(args.is_ok(), "Valid blur command should parse successfully");
         let parsed = args?;
 
@@ -469,7 +469,7 @@ mod tests {
         }
 
         // Test parsing a valid fractal command
-        let args2 = Args::try_parse_from(&["mirage", "fractal", "output.png", "100", "200"]);
+        let args2 = Args::try_parse_from(["mirage", "fractal", "output.png", "100", "200"]);
         ensure!(
             args2.is_ok(),
             "Valid fractal command should parse successfully"

@@ -505,7 +505,7 @@ fn test_help_commands() -> Result<()> {
 
     // Test subcommand help
     let status = Command::new("target/release/mirage")
-        .args(&["blur", "--help"])
+        .args(["blur", "--help"])
         .stdout(Stdio::null()) // suppress stdout
         .status()?;
     ensure!(status.success(), "Subcommand help should work");
