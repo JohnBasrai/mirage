@@ -2,8 +2,10 @@ use anyhow::{ensure, Result};
 use image::{DynamicImage, GenericImageView};
 use std::fs;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use tempfile::TempDir;
+
+const TEST_IMAGE: &str = "Test_Image.PNG";
 
 // Helper function to run mirage commands
 fn run_mirage_command(args: &[&str]) -> Result<bool> {
@@ -12,6 +14,19 @@ fn run_mirage_command(args: &[&str]) -> Result<bool> {
     println!("run_command: {command_line}");
 
     let status = Command::new("target/release/mirage").args(args).status()?;
+    Ok(status.success())
+}
+
+fn run_mirage_command_suppress_output(args: &[&str]) -> Result<bool> {
+    // ---
+    let command_line = format!("target/release/mirage {}", args.join(" "));
+    println!("run_command: {command_line}");
+
+    let status = Command::new("target/release/mirage")
+        .args(args)
+        .stdout(Stdio::null()) // suppress stdout
+        .stderr(Stdio::null()) // suppress stderr
+        .status()?;
     Ok(status.success())
 }
 
@@ -113,11 +128,7 @@ fn test_grayscale_integration() -> Result<()> {
     let output_file = temp_dir.path().join("test_gray.png");
 
     // Run grayscale command
-    let success = run_mirage_command(&[
-        "grayscale",
-        "Test_Image.PNG",
-        &output_file.to_string_lossy(),
-    ])?;
+    let success = run_mirage_command(&["grayscale", TEST_IMAGE, &output_file.to_string_lossy()])?;
     ensure!(success, "Grayscale command should succeed");
 
     // Verify output file
@@ -127,7 +138,7 @@ fn test_grayscale_integration() -> Result<()> {
     let result = image::open(&output_file)?;
 
     // Verify dimensions match original
-    let original = image::open("Test_Image.PNG")?;
+    let original = image::open(TEST_IMAGE)?;
     ensure!(
         original.dimensions() == result.dimensions(),
         "Grayscale image should have same dimensions as original"
@@ -149,8 +160,7 @@ fn test_invert_integration() -> Result<()> {
     let invert2_file = temp_dir.path().join("test_invert2.png");
 
     // Invert once
-    let success1 =
-        run_mirage_command(&["invert", "Test_Image.PNG", &invert1_file.to_string_lossy()])?;
+    let success1 = run_mirage_command(&["invert", TEST_IMAGE, &invert1_file.to_string_lossy()])?;
     ensure!(success1, "First invert command should succeed");
     verify_output_file(&invert1_file, 1000)?;
 
@@ -164,7 +174,7 @@ fn test_invert_integration() -> Result<()> {
     verify_output_file(&invert2_file, 1000)?;
 
     // Verify dimensions
-    let original = image::open("Test_Image.PNG")?;
+    let original = image::open(TEST_IMAGE)?;
     let double_inverted = image::open(&invert2_file)?;
 
     ensure!(
@@ -188,19 +198,14 @@ fn test_blur_integration() -> Result<()> {
     let output_file = temp_dir.path().join("test_blur.png");
 
     // Run blur command
-    let success = run_mirage_command(&[
-        "blur",
-        "Test_Image.PNG",
-        &output_file.to_string_lossy(),
-        "50",
-    ])?;
+    let success = run_mirage_command(&["blur", TEST_IMAGE, &output_file.to_string_lossy(), "5"])?;
     ensure!(success, "Blur command should succeed");
 
     // Verify output file
     verify_output_file(&output_file, 1000)?;
 
     // Load images and verify properties
-    let original = image::open("Test_Image.PNG")?;
+    let original = image::open(TEST_IMAGE)?;
     let blurred = image::open(&output_file)?;
 
     // Same dimensions
@@ -235,12 +240,8 @@ fn test_rotate_integration() -> Result<()> {
     let rotate360_file = temp_dir.path().join("test_rotate360.png");
 
     // Test 90 degree rotation
-    let success = run_mirage_command(&[
-        "rotate",
-        "Test_Image.PNG",
-        &rotate90_file.to_string_lossy(),
-        "90",
-    ])?;
+    let success =
+        run_mirage_command(&["rotate", TEST_IMAGE, &rotate90_file.to_string_lossy(), "90"])?;
     ensure!(success, "90 degree rotation should succeed");
     verify_output_file(&rotate90_file, 1000)?;
 
@@ -275,7 +276,7 @@ fn test_rotate_integration() -> Result<()> {
     verify_output_file(&rotate360_file, 1000)?;
 
     // Verify that after 4x 90-degree rotations, we get back to original dimensions
-    let original = image::open("Test_Image.PNG")?;
+    let original = image::open(TEST_IMAGE)?;
     let rotated_360 = image::open(&rotate360_file)?;
 
     ensure!(
@@ -299,17 +300,13 @@ fn test_brighten_smoke() -> Result<()> {
     let output_file = temp_dir.path().join("test_brighten.png");
 
     // Test positive brightening
-    let success = run_mirage_command(&[
-        "brighten",
-        "Test_Image.PNG",
-        &output_file.to_string_lossy(),
-        "30",
-    ])?;
+    let success =
+        run_mirage_command(&["brighten", TEST_IMAGE, &output_file.to_string_lossy(), "30"])?;
     ensure!(success, "Brighten command should succeed");
     verify_output_file(&output_file, 1000)?;
 
     // Verify dimensions
-    let original = image::open("Test_Image.PNG")?;
+    let original = image::open(TEST_IMAGE)?;
     let brightened = image::open(&output_file)?;
     ensure!(
         original.dimensions() == brightened.dimensions(),
@@ -328,8 +325,9 @@ fn test_brighten_smoke() -> Result<()> {
     let darken_file = temp_dir.path().join("test_darken.png");
     let success = run_mirage_command(&[
         "brighten",
-        "Test_Image.PNG",
+        TEST_IMAGE,
         &darken_file.to_string_lossy(),
+        "--",
         "-20",
     ])?;
     ensure!(success, "Darken command should succeed");
@@ -349,7 +347,7 @@ fn test_crop_smoke() -> Result<()> {
     // Crop a 100x100 region starting at (10, 10)
     let success = run_mirage_command(&[
         "crop",
-        "Test_Image.PNG",
+        TEST_IMAGE,
         &output_file.to_string_lossy(),
         "10",
         "10",
@@ -427,7 +425,8 @@ fn test_generate_placeholder_smoke() -> Result<()> {
 fn test_invalid_input_file() -> Result<()> {
     // ---
 
-    let success = run_mirage_command(&["blur", "nonexistent.png", "output.png", "50"])?;
+    let success =
+        run_mirage_command_suppress_output(&["blur", "nonexistent.png", "output.png", "50"])?;
     ensure!(!success, "Command with nonexistent input should fail");
 
     Ok(())
@@ -437,10 +436,10 @@ fn test_invalid_input_file() -> Result<()> {
 fn test_invalid_rotation_degrees() -> Result<()> {
     // ---
 
-    let success = run_mirage_command(&["rotate", "Test_Image.PNG", "output.png", "45"])?;
+    let success = run_mirage_command_suppress_output(&["rotate", TEST_IMAGE, "output.png", "45"])?;
     ensure!(!success, "Invalid rotation degrees should fail");
 
-    let success = run_mirage_command(&["rotate", "Test_Image.PNG", "output.png", "360"])?;
+    let success = run_mirage_command_suppress_output(&["rotate", TEST_IMAGE, "output.png", "360"])?;
     ensure!(!success, "Invalid rotation degrees should fail");
 
     Ok(())
@@ -450,10 +449,11 @@ fn test_invalid_rotation_degrees() -> Result<()> {
 fn test_invalid_blur_percentage() -> Result<()> {
     // ---
 
-    let success = run_mirage_command(&["blur", "Test_Image.PNG", "output.png", "150"])?;
+    let success = run_mirage_command_suppress_output(&["blur", TEST_IMAGE, "output.png", "150"])?;
     ensure!(!success, "Blur percentage over 100 should fail");
 
-    let success = run_mirage_command(&["blur", "Test_Image.PNG", "output.png", "-10"])?;
+    let success =
+        run_mirage_command_suppress_output(&["blur", TEST_IMAGE, "output.png", "--", "-10"])?;
     ensure!(!success, "Negative blur percentage should fail");
 
     Ok(())
@@ -472,10 +472,8 @@ fn test_operation_consistency() -> Result<()> {
     let output2 = temp_dir.path().join("consistency2.png");
 
     // Run same operation twice
-    let success1 =
-        run_mirage_command(&["blur", "Test_Image.PNG", &output1.to_string_lossy(), "25"])?;
-    let success2 =
-        run_mirage_command(&["blur", "Test_Image.PNG", &output2.to_string_lossy(), "25"])?;
+    let success1 = run_mirage_command(&["blur", TEST_IMAGE, &output1.to_string_lossy(), "25"])?;
+    let success2 = run_mirage_command(&["blur", TEST_IMAGE, &output2.to_string_lossy(), "25"])?;
 
     ensure!(success1 && success2, "Both operations should succeed");
 
@@ -499,14 +497,16 @@ fn test_help_commands() -> Result<()> {
     // ---
 
     // Test general help
-    let status = Command::new("cargo")
-        .args(&["run", "--quiet", "--", "--help"])
+    let status = Command::new("target/release/mirage")
+        .arg("--help")
+        .stdout(Stdio::null()) // suppress stdout
         .status()?;
     ensure!(status.success(), "General help should work");
 
     // Test subcommand help
-    let status = Command::new("cargo")
-        .args(&["run", "--quiet", "--", "blur", "--help"])
+    let status = Command::new("target/release/mirage")
+        .args(&["blur", "--help"])
+        .stdout(Stdio::null()) // suppress stdout
         .status()?;
     ensure!(status.success(), "Subcommand help should work");
 
