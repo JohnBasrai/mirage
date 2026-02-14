@@ -2,7 +2,6 @@
 name = "mirage"
 version = "0.1.2"
 edition = "2021"
-authors = ["John Basrai <John@Basrai.dev>"]
 description = "A fast and simple command-line image processing tool"
 readme = "README.md"
 homepage = "https://github.com/yourusername/mirage"
